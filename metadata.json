@@ -1,0 +1,6 @@
+{
+  "name": "Invoice Data Extractor",
+  "description": "An automated invoice analysis and data extraction tool designed for accounts payable teams, powered by Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
