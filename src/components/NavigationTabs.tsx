@@ -10,7 +10,8 @@ import {
   DollarSign, 
   History, 
   AlertCircle, 
-  Calendar 
+  Calendar,
+  Lock
 } from 'lucide-react';
 
 interface NavigationTabsProps {
@@ -20,8 +21,9 @@ interface NavigationTabsProps {
 }
 
 export const NavigationTabs: React.FC<NavigationTabsProps> = ({ activeTab, onSelectTab, counts }) => {
-  const tabs: { id: FilterViewTab; label: string; count: number; icon: any; isUrgent?: boolean }[] = [
+  const tabs: { id: FilterViewTab; label: string; count: number; icon: any; isUrgent?: boolean; isSecurity?: boolean }[] = [
     { id: 'ALL_IMPORTED', label: 'All Imported Invoices', count: counts.ALL_IMPORTED || 0, icon: Layers },
+    { id: 'SECURITY_CENTRE', label: 'Security & Control Centre', count: counts.SECURITY_CENTRE || 0, icon: Lock, isSecurity: true },
     { id: 'OVERDUE', label: 'Overdue', count: counts.OVERDUE || 0, icon: AlertCircle },
     { id: 'DUE_TODAY', label: 'Due Today', count: counts.DUE_TODAY || 0, icon: Clock },
     { id: 'DUE_WITHIN_5_DAYS', label: 'Due Within 5 Days', count: counts.DUE_WITHIN_5_DAYS || 0, icon: AlertTriangle, isUrgent: true },
@@ -44,6 +46,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({ activeTab, onSel
           const IconComponent = tab.icon;
           const isActive = activeTab === tab.id;
           const isUrgent5 = tab.isUrgent;
+          const isSecurity = tab.isSecurity;
 
           return (
             <button
@@ -51,9 +54,13 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({ activeTab, onSel
               onClick={() => onSelectTab(tab.id)}
               className={`flex items-center space-x-2 py-3 px-3 text-xs font-bold rounded-t-lg transition-all border-b-2 cursor-pointer ${
                 isActive
-                  ? isUrgent5
+                  ? isSecurity
+                    ? 'border-indigo-600 text-indigo-950 bg-indigo-50/90 shadow-xs ring-1 ring-indigo-400/40'
+                    : isUrgent5
                     ? 'border-amber-500 text-amber-950 bg-amber-50/90 shadow-xs ring-1 ring-amber-400/40'
                     : 'border-indigo-600 text-indigo-950 bg-white shadow-xs'
+                  : isSecurity
+                  ? 'border-transparent text-indigo-900 bg-indigo-100/50 hover:bg-indigo-100 font-extrabold'
                   : isUrgent5
                   ? 'border-transparent text-amber-900 bg-amber-100/50 hover:bg-amber-100 hover:text-amber-950 font-extrabold'
                   : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -64,16 +71,20 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({ activeTab, onSel
               )}
               <IconComponent className={`w-3.5 h-3.5 shrink-0 ${
                 isActive 
-                  ? isUrgent5 ? 'text-amber-600' : 'text-indigo-600' 
-                  : isUrgent5 ? 'text-amber-700' : 'text-slate-500'
+                  ? isSecurity ? 'text-indigo-600' : isUrgent5 ? 'text-amber-600' : 'text-indigo-600' 
+                  : isSecurity ? 'text-indigo-700' : isUrgent5 ? 'text-amber-700' : 'text-slate-500'
               }`} />
               <span>{tab.label}</span>
               <span
                 className={`ml-1 py-0.5 px-2 rounded-full text-[10px] font-extrabold border ${
                   isActive
-                    ? isUrgent5
+                    ? isSecurity
+                      ? 'bg-indigo-700 text-white border-indigo-800'
+                      : isUrgent5
                       ? 'bg-amber-600 text-white border-amber-700'
                       : 'bg-indigo-600 text-white border-indigo-700'
+                    : isSecurity
+                    ? 'bg-indigo-200 text-indigo-900 border-indigo-300 font-extrabold'
                     : isUrgent5
                     ? 'bg-amber-200 text-amber-900 border-amber-300 font-extrabold'
                     : 'bg-slate-200 text-slate-700 border-slate-300'

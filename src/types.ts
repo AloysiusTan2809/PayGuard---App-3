@@ -4,6 +4,12 @@ export type ExceptionStatus = 'None' | 'Unresolved' | 'Resolved' | 'Rejected';
 export type AuthorisationStatus = 'Pending' | 'Authorised' | 'Blocked' | 'Rejected';
 export type PaymentStatus = 'Pending' | 'Authorised – Ready for Manual Payment' | 'Paid' | 'On Hold' | 'Rejected';
 
+export type UserRole = 
+  | 'Department Approver'
+  | 'AP Lead – Madam Lim'
+  | 'Payment Recorder'
+  | 'Read-Only Reviewer';
+
 export type BankVerificationMethod =
   | 'Approved supplier master record'
   | 'Existing verified phone number'
@@ -11,12 +17,37 @@ export type BankVerificationMethod =
   | 'Authorised supplier representative'
   | 'Other independently verified source';
 
+export interface AuthorisationControlReceipt {
+  receiptId: string;
+  datasetSource: string;
+  supplierName: string;
+  invoiceNumber: string;
+  poNumber: string;
+  grnNumber: string;
+  invoiceTotal: number;
+  currency: string;
+  acceptedPaymentMethod: string;
+  dueDate: string;
+  dueDateCategory: string;
+  app2MatchStatus: string;
+  exceptionStatus: string;
+  departmentApprovalStatus: string;
+  departmentApprovedBy: string;
+  bankVerificationStatus: string;
+  bankVerifiedBy: string;
+  authorisedBy: string;
+  authorisationDate: string;
+  authorisationComment: string;
+  finalStatus: string;
+}
+
 export interface InvoiceRecord {
   // Core 33 Columns from "App 3 Handoff"
   id: string; // Unique identifier (Handoff Record ID or Invoice Number)
   handoffRecordId?: string;
   invoiceNumber: string;
   supplierName: string;
+  supplierAddress?: string;
   supplierContactDetails?: string;
   businessRegTaxId?: string;
   invoiceDate?: string;
@@ -38,8 +69,32 @@ export interface InvoiceRecord {
   exceptionSummary: string;
   departmentApprovalStatus: DepartmentApprovalStatus;
   departmentApprovedBy: string;
+  approversDepartment?: string;
   departmentApprovalDate: string;
   departmentApprovalComment?: string;
+  supportingEvidenceReference?: string;
+  isDeptApprovalLocked?: boolean;
+  originalDeptApprovalRecord?: {
+    status: string;
+    approvedBy: string;
+    department: string;
+    approvalDate: string;
+    comment: string;
+    evidenceRef?: string;
+  };
+  departmentApprovalHistory?: Array<{
+    status: string;
+    approvedBy: string;
+    department: string;
+    approvalDate: string;
+    comment: string;
+    evidenceRef?: string;
+    amendedBy: string;
+    amendedDate: string;
+    reason: string;
+  }>;
+  failedPinAttempts?: number;
+  pinLockoutUntilTimestamp?: number | null;
   app3IntakeStatus?: string;
   paymentEligibility?: string;
   blockingReason?: string;
@@ -49,6 +104,9 @@ export interface InvoiceRecord {
   bankVerificationDate: string;
   bankVerificationMethod: string;
   bankVerificationComment?: string;
+  bankAccountVerificationTrustedContact?: boolean;
+  bankAccountVerificationSourceConfirmed?: boolean;
+  bankAccountChanged?: boolean;
   authorisationStatus: AuthorisationStatus;
   authorisedBy: string;
   authorisationDate: string;
@@ -74,6 +132,10 @@ export interface InvoiceRecord {
   returnedToApp2Date?: string;
   returnedToApp2By?: string;
   returnedToApp2Reason?: string;
+
+  // Authorisation Receipt
+  receiptGenerated?: boolean;
+  receiptId?: string;
 
   // Metadata & Audit
   importValidationErrors?: string[];
@@ -120,6 +182,7 @@ export type FilterViewTab =
   | 'ELIGIBLE_FOR_AUTH'
   | 'AUTHORISED_READY_PAYMENT'
   | 'PAID'
+  | 'SECURITY_CENTRE'
   | 'IMPORT_EXPORT'
   | 'AUDIT_LOGS'
   | 'RESPONSIBLE_USE'
@@ -132,8 +195,13 @@ export interface AuditLogEntry {
   supplierName: string;
   action: string;
   user: string;
+  role?: UserRole | string;
   details: string;
   statusAfter: string;
+  previousValue?: string;
+  newValue?: string;
+  comment?: string;
+  datasetSource?: string;
 }
 
 export interface UploadMetadata {

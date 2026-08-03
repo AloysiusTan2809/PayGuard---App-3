@@ -1,6 +1,7 @@
 import React from 'react';
 import { UploadMetadata } from '../types';
-import { FileSpreadsheet, Download, RefreshCw, Upload, ShieldCheck, Calendar, Sparkles, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { AuthenticatedUser } from '../services/authService';
+import { Download, RefreshCw, Upload, ShieldCheck, Calendar, Sparkles, Clock, AlertTriangle, CheckCircle2, Shield, LogOut, UserCheck } from 'lucide-react';
 
 interface HeaderProps {
   metadata: UploadMetadata;
@@ -13,6 +14,8 @@ interface HeaderProps {
   onChangeAsOfDate: (newDate: string) => void;
   onRunDueDateCheck: () => void;
   onOpenWalkthroughModal?: () => void;
+  currentUser: AuthenticatedUser;
+  onSignOut: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -25,7 +28,9 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleDemoMode,
   onChangeAsOfDate,
   onRunDueDateCheck,
-  onOpenWalkthroughModal
+  onOpenWalkthroughModal,
+  currentUser,
+  onSignOut
 }) => {
   return (
     <header className="bg-white text-slate-900 border-b border-slate-200 sticky top-0 z-30 shadow-xs">
@@ -116,9 +121,36 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Demo Date Mode & As-of Date Bar */}
+        {/* Secure User Access & As-of Date Bar */}
         <div className="mt-3 pt-2.5 border-t border-slate-200 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5 text-xs bg-slate-50 p-2.5 rounded-xl border">
           <div className="flex flex-wrap items-center gap-3">
+            
+            {/* Secure User Access Info */}
+            <div className="flex flex-wrap items-center space-x-2.5 bg-slate-900 text-white px-3 py-1.5 rounded-lg shadow-xs border border-indigo-700">
+              <div className="flex items-center space-x-1.5">
+                <UserCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span className="font-extrabold text-indigo-300 text-xs whitespace-nowrap">Secure User Access:</span>
+              </div>
+              <div className="flex items-center space-x-2 text-xs">
+                <span>Signed in as: <strong className="text-white font-extrabold underline">{currentUser.name}</strong></span>
+                <span className="text-slate-500">•</span>
+                <span>Role: <strong className="text-amber-300 font-extrabold">{currentUser.role}</strong></span>
+                <span className="text-slate-500">•</span>
+                <div className="flex items-center space-x-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-emerald-300 font-mono text-[11px] font-bold">Session: Active</span>
+                </div>
+              </div>
+              <button
+                onClick={onSignOut}
+                className="ml-2 inline-flex items-center px-2.5 py-0.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded border border-rose-500 shadow-xs transition-colors cursor-pointer"
+                title="Sign out of current PayGuard session"
+              >
+                <LogOut className="w-3 h-3 mr-1" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+
             <div className="flex items-center space-x-2">
               <Calendar className="w-4 h-4 text-indigo-600 shrink-0" />
               <span className="font-bold text-slate-800">As-of Date:</span>
@@ -149,6 +181,17 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
+        {/* Human Control Notice */}
+        <div className="mt-2 text-[11px] text-slate-600 bg-indigo-50/90 border border-indigo-200 px-3 py-1.5 rounded-lg flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Shield className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+            <span className="font-medium text-slate-700">
+              <strong>Control Notice:</strong> PayGuard records authorisation and external payment information only. It does not transfer money.
+            </span>
+          </div>
+          <span className="text-[10px] text-indigo-800 font-mono font-bold">Assigned Account Role: {currentUser.role}</span>
+        </div>
+
         {/* Demo Date Mode Banner */}
         {isDemoDateMode && (
           <div className="mt-2 p-2 bg-amber-500/15 border border-amber-300 rounded-lg text-xs font-bold text-amber-950 flex items-center justify-between">
@@ -171,4 +214,3 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-
